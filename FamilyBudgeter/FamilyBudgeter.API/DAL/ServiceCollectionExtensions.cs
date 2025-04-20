@@ -14,8 +14,8 @@ namespace FamilyBudgeter.API.DAL
             // Реєстрація DbContext
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection"),
-                    b => b.MigrationsAssembly("FamilyBudgeter.API.DAL")));
+                    configuration.GetConnectionString("DefaultConnection")
+                   ));
 
             // Реєстрація репозиторіїв
             services.AddScoped<IUserRepository, UserRepository>();

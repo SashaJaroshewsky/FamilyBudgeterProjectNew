@@ -10,9 +10,9 @@ namespace FamilyBudgeter.API.Domain.Entities
         public NotificationType Type { get; set; }
 
         public int UserId { get; set; }
-        public required User User { get; set; }
+        public virtual User? User { get; set; }
 
         public int? FamilyId { get; set; }
-        public required Family Family { get; set; }
+        public virtual Family? Family { get; set; }
     }
 }

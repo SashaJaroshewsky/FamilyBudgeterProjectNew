@@ -11,7 +11,7 @@ namespace FamilyBudgeter.API.Domain.Entities
 
         // Зв'язок із сім'єю
         public int FamilyId { get; set; }
-        public required Family Family { get; set; }
+        public virtual Family? Family { get; set; }
 
         // Навігаційні властивості
         public virtual ICollection<Category> Categories { get; set; } = new List<Category>();

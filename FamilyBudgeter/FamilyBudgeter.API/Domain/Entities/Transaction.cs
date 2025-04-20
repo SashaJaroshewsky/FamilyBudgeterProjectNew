@@ -9,12 +9,12 @@
 
         // Зв'язки з іншими сутностями
         public int CategoryId { get; set; }
-        public required Category Category { get; set; }
+        public virtual Category? Category { get; set; }
 
         public int BudgetId { get; set; }
-        public required Budget Budget { get; set; }
+        public virtual Budget? Budget { get; set; }
 
         public int CreatedByUserId { get; set; }
-        public required User CreatedByUser { get; set; }
+        public virtual User? CreatedByUser { get; set; }
     }
 }

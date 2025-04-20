@@ -12,6 +12,6 @@ namespace FamilyBudgeter.API.Domain.Entities
         public FinancialGoalStatus Status { get; set; } = FinancialGoalStatus.InProgress;
 
         public int BudgetId { get; set; }
-        public required Budget Budget { get; set; }
+        public virtual Budget? Budget { get; set; }
     }
 }

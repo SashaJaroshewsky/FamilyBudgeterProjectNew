@@ -20,7 +20,7 @@ namespace FamilyBudgeter.API.DAL.Repositories
         {
             return await _context.FamilyMembers
                 .Where(fm => fm.UserId == userId)
-                .Select(fm => fm.Family)
+                .Select(fm => fm.Family!)
                 .ToListAsync();
         }
     }

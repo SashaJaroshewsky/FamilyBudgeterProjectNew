@@ -26,6 +26,31 @@ namespace FamilyBudgeter.API.DAL.Context
         {
             base.OnModelCreating(modelBuilder);
 
+            // Конфігурація типів decimal для всіх властивостей
+            // Transaction
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            // BudgetLimit
+            modelBuilder.Entity<BudgetLimit>()
+                .Property(bl => bl.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            // FinancialGoal
+            modelBuilder.Entity<FinancialGoal>()
+                .Property(fg => fg.TargetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<FinancialGoal>()
+                .Property(fg => fg.CurrentAmount)
+                .HasColumnType("decimal(18,2)");
+
+            // RegularPayment
+            modelBuilder.Entity<RegularPayment>()
+                .Property(rp => rp.Amount)
+                .HasColumnType("decimal(18,2)");
+
             // Конфігурація сутностей
             // User
             modelBuilder.Entity<User>()
@@ -47,30 +72,35 @@ namespace FamilyBudgeter.API.DAL.Context
             modelBuilder.Entity<FamilyMember>()
                 .HasOne(fm => fm.Family)
                 .WithMany(f => f.Members)
-                .HasForeignKey(fm => fm.FamilyId);
+                .HasForeignKey(fm => fm.FamilyId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Budget
             modelBuilder.Entity<Budget>()
                 .HasOne(b => b.Family)
                 .WithMany(f => f.Budgets)
-                .HasForeignKey(b => b.FamilyId);
+                .HasForeignKey(b => b.FamilyId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Category
             modelBuilder.Entity<Category>()
                 .HasOne(c => c.Budget)
                 .WithMany(b => b.Categories)
-                .HasForeignKey(c => c.BudgetId);
+                .HasForeignKey(c => c.BudgetId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Transaction
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.Category)
                 .WithMany(c => c.Transactions)
-                .HasForeignKey(t => t.CategoryId);
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict); // Змінено з CASCADE на RESTRICT
 
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.Budget)
                 .WithMany(b => b.Transactions)
-                .HasForeignKey(t => t.BudgetId);
+                .HasForeignKey(t => t.BudgetId)
+                .OnDelete(DeleteBehavior.Restrict); // Змінено з CASCADE на RESTRICT
 
             modelBuilder.Entity<Transaction>()
                 .HasOne(t => t.CreatedByUser)
@@ -82,41 +112,48 @@ namespace FamilyBudgeter.API.DAL.Context
             modelBuilder.Entity<BudgetLimit>()
                 .HasOne(bl => bl.Category)
                 .WithMany(c => c.BudgetLimits)
-                .HasForeignKey(bl => bl.CategoryId);
+                .HasForeignKey(bl => bl.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict); // Змінено з CASCADE на RESTRICT
 
             modelBuilder.Entity<BudgetLimit>()
                 .HasOne(bl => bl.Budget)
                 .WithMany(b => b.BudgetLimits)
-                .HasForeignKey(bl => bl.BudgetId);
+                .HasForeignKey(bl => bl.BudgetId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // FinancialGoal
             modelBuilder.Entity<FinancialGoal>()
                 .HasOne(fg => fg.Budget)
                 .WithMany(b => b.FinancialGoals)
-                .HasForeignKey(fg => fg.BudgetId);
+                .HasForeignKey(fg => fg.BudgetId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Notification
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.User)
                 .WithMany(u => u.Notifications)
-                .HasForeignKey(n => n.UserId);
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.Family)
                 .WithMany()
                 .HasForeignKey(n => n.FamilyId)
-                .IsRequired(false);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict); // Змінено з CASCADE на RESTRICT
 
             // RegularPayment
             modelBuilder.Entity<RegularPayment>()
                 .HasOne(rp => rp.Category)
                 .WithMany()
-                .HasForeignKey(rp => rp.CategoryId);
+                .HasForeignKey(rp => rp.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict); // Змінено з CASCADE на RESTRICT
 
             modelBuilder.Entity<RegularPayment>()
                 .HasOne(rp => rp.Budget)
                 .WithMany()
-                .HasForeignKey(rp => rp.BudgetId);
+                .HasForeignKey(rp => rp.BudgetId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public override int SaveChanges()
