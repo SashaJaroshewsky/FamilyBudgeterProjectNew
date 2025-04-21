@@ -11,6 +11,7 @@ import BudgetPage from './pages/BudgetPage';
 import BudgetDetailsPage from './pages/BudgetDetailsPage';
 import TransactionsPage from './pages/TransactionsPage';
 import FinancialGoalsPage from './pages/FinancialGoalsPage';
+import CreateFinancialGoalPage from './pages/CreateFinancialGoalPage';
 import RegularPaymentsPage from './pages/RegularPaymentsPage';
 import AnalysisPage from './pages/AnalysisPage';
 import NotificationsPage from './pages/NotificationsPage';
@@ -21,6 +22,7 @@ import CreateBudgetPage from './pages/CreateBudgetPage';
 import CreateTransactionPage from './pages/CreateTransactionPage';
 import CategoriesPage from './pages/CategoriesPage';
 import CreateCategoryPage from './pages/CreateCategoryPage';
+import CreateFamilyPage from './pages/CreateFamilyPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -45,6 +47,11 @@ const AppRoutes: React.FC = () => {
       <Route path="/families/:familyId" element={
         <PrivateRoute>
           <FamilyPage isDetail />
+        </PrivateRoute>
+      } />
+      <Route path="/families/create" element={
+        <PrivateRoute>
+          <CreateFamilyPage />
         </PrivateRoute>
       } />
 
@@ -83,9 +90,19 @@ const AppRoutes: React.FC = () => {
           <FinancialGoalsPage />
         </PrivateRoute>
       } />
+      <Route path="/goals/create" element={
+        <PrivateRoute>
+          <CreateFinancialGoalPage />
+        </PrivateRoute>
+      } />
       <Route path="/budgets/:budgetId/goals" element={
         <PrivateRoute>
           <FinancialGoalsPage />
+        </PrivateRoute>
+      } />
+      <Route path="/budgets/:budgetId/goals/create" element={
+        <PrivateRoute>
+          <CreateFinancialGoalPage />
         </PrivateRoute>
       } />
 

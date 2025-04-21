@@ -7,6 +7,7 @@ import { Family } from '../models/FamilyModels';
 import AppHeader from '../components/common/AppHeader';
 import FamilyCard from '../components/family/FamilyCard';
 import Loader from '../components/common/Loader';
+import JoinFamilyModal from '../components/family/JoinFamilyModal';
 
 interface FamilyPageProps {
   isDetail?: boolean;
@@ -20,6 +21,7 @@ const FamilyPage: React.FC<FamilyPageProps> = ({ isDetail = false }) => {
   const [currentFamily, setCurrentFamily] = useState<Family | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
   useEffect(() => {
     const fetchFamilies = async () => {
@@ -48,6 +50,16 @@ const FamilyPage: React.FC<FamilyPageProps> = ({ isDetail = false }) => {
 
   const handleCreateFamily = () => {
     navigate('/families/create');
+  };
+
+  const handleJoinSuccess = async () => {
+    // Оновлюємо список сімей після успішного приєднання
+    try {
+      const userFamilies = await familyApi.getUserFamilies();
+      setFamilies(userFamilies);
+    } catch (err) {
+      setError('Помилка оновлення списку сімей');
+    }
   };
 
   if (loading) {
@@ -169,10 +181,16 @@ const FamilyPage: React.FC<FamilyPageProps> = ({ isDetail = false }) => {
           <Card.Body>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h1 className="h2 mb-0">Мої сім'ї</h1>
-              <Button variant="primary" onClick={handleCreateFamily}>
-                <i className="bi bi-plus-lg me-2"></i>
-                Створити сім'ю
-              </Button>
+              <div className="d-flex gap-2">
+                <Button variant="outline-primary" onClick={() => setShowJoinModal(true)}>
+                  <i className="bi bi-box-arrow-in-right me-2"></i>
+                  Приєднатися до сім'ї
+                </Button>
+                <Button variant="primary" onClick={handleCreateFamily}>
+                  <i className="bi bi-plus-lg me-2"></i>
+                  Створити сім'ю
+                </Button>
+              </div>
             </div>
 
             {families.length > 0 ? (
@@ -199,6 +217,12 @@ const FamilyPage: React.FC<FamilyPageProps> = ({ isDetail = false }) => {
           </Card.Body>
         </Card>
       </Container>
+
+      <JoinFamilyModal 
+        show={showJoinModal}
+        onHide={() => setShowJoinModal(false)}
+        onSuccess={handleJoinSuccess}
+      />
     </>
   );
 };

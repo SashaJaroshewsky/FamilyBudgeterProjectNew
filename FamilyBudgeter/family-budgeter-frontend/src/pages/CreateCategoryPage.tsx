@@ -146,7 +146,6 @@ const CreateCategoryPage: React.FC = () => {
                         ...prev, 
                         budgetId: parseInt(e.target.value, 10) 
                       }))}
-                      disabled={!!preselectedBudgetId}
                     >
                       <option value="">Виберіть бюджет</option>
                       {budgets.map(budget => (

@@ -1,5 +1,6 @@
 // src/components/auth/RegisterForm.tsx
 import React, { useState } from 'react';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import { UserRegistration } from '../../models/AuthModels';
 
@@ -12,62 +13,19 @@ const RegisterForm: React.FC = () => {
     lastName: ''
   });
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState<{ 
-    email?: string; 
-    password?: string;
-    confirmPassword?: string;
-    firstName?: string;
-    lastName?: string;
-  }>({});
+  const [validated, setValidated] = useState(false);
 
-  const validateForm = () => {
-    const newErrors: { 
-      email?: string; 
-      password?: string;
-      confirmPassword?: string;
-      firstName?: string;
-      lastName?: string;
-    } = {};
-    let isValid = true;
-
-    // Валідація email
-    if (!formData.email) {
-      newErrors.email = 'Поле "Електронна пошта" обов\'язкове';
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Невірний формат електронної пошти';
-      isValid = false;
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    
+    if (form.checkValidity() === false || formData.password !== confirmPassword) {
+      event.stopPropagation();
+      setValidated(true);
+      return;
     }
 
-    // Валідація імені
-    if (!formData.firstName) {
-      newErrors.firstName = 'Поле "Ім\'я" обов\'язкове';
-      isValid = false;
-    }
-
-    // Валідація прізвища
-    if (!formData.lastName) {
-      newErrors.lastName = 'Поле "Прізвище" обов\'язкове';
-      isValid = false;
-    }
-
-    // Валідація пароля
-    if (!formData.password) {
-      newErrors.password = 'Поле "Пароль" обов\'язкове';
-      isValid = false;
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Пароль має містити щонайменше 6 символів';
-      isValid = false;
-    }
-
-    // Валідація підтвердження пароля
-    if (formData.password !== confirmPassword) {
-      newErrors.confirmPassword = 'Паролі не співпадають';
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
+    await register(formData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,88 +41,121 @@ const RegisterForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
-      await register(formData);
-    }
-  };
-
   return (
-    <div className="register-form">
-      <h2>Реєстрація</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="firstName">Ім'я</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            disabled={loading}
-          />
-          {errors.firstName && <div className="error">{errors.firstName}</div>}
-        </div>
+    <Form noValidate validated={validated} onSubmit={handleSubmit}>
+      <h2 className="text-center mb-4">Реєстрація</h2>
+      
+      <Row className="g-3 mb-3">
+        <Col md={6}>
+          <Form.Group controlId="firstName">
+            <Form.Label>Ім'я</Form.Label>
+            <Form.Control
+              required
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              disabled={loading}
+              placeholder="Введіть ваше ім'я"
+              minLength={2}
+            />
+            <Form.Control.Feedback type="invalid">
+              Введіть коректне ім'я (мінімум 2 символи)
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
         
-        <div className="form-group">
-          <label htmlFor="lastName">Прізвище</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            disabled={loading}
-          />
-          {errors.lastName && <div className="error">{errors.lastName}</div>}
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="email">Електронна пошта</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            disabled={loading}
-          />
-          {errors.email && <div className="error">{errors.email}</div>}
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="password">Пароль</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            disabled={loading}
-          />
-          {errors.password && <div className="error">{errors.password}</div>}
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Підтвердження пароля</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={confirmPassword}
-            onChange={handleChange}
-            disabled={loading}
-          />
-          {errors.confirmPassword && <div className="error">{errors.confirmPassword}</div>}
-        </div>
-        
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Завантаження...' : 'Зареєструватися'}
-        </button>
-      </form>
-    </div>
+        <Col md={6}>
+          <Form.Group controlId="lastName">
+            <Form.Label>Прізвище</Form.Label>
+            <Form.Control
+              required
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              disabled={loading}
+              placeholder="Введіть ваше прізвище"
+              minLength={2}
+            />
+            <Form.Control.Feedback type="invalid">
+              Введіть коректне прізвище (мінімум 2 символи)
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+      </Row>
+
+      <Form.Group className="mb-3" controlId="email">
+        <Form.Label>Електронна пошта</Form.Label>
+        <Form.Control
+          required
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          disabled={loading}
+          placeholder="example@domain.com"
+        />
+        <Form.Control.Feedback type="invalid">
+          Введіть коректну електронну адресу
+        </Form.Control.Feedback>
+      </Form.Group>
+
+      <Form.Group className="mb-3" controlId="password">
+        <Form.Label>Пароль</Form.Label>
+        <Form.Control
+          required
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          disabled={loading}
+          placeholder="Введіть пароль"
+          minLength={6}
+        />
+        <Form.Text className="text-muted">
+          Пароль має містити щонайменше 6 символів
+        </Form.Text>
+        <Form.Control.Feedback type="invalid">
+          Пароль має містити щонайменше 6 символів
+        </Form.Control.Feedback>
+      </Form.Group>
+
+      <Form.Group className="mb-4" controlId="confirmPassword">
+        <Form.Label>Підтвердження пароля</Form.Label>
+        <Form.Control
+          required
+          type="password"
+          name="confirmPassword"
+          value={confirmPassword}
+          onChange={handleChange}
+          disabled={loading}
+          placeholder="Повторіть пароль"
+          isInvalid={validated && formData.password !== confirmPassword}
+        />
+        <Form.Control.Feedback type="invalid">
+          Паролі не співпадають
+        </Form.Control.Feedback>
+      </Form.Group>
+
+      <div className="d-grid">
+        <Button
+          variant="primary"
+          type="submit"
+          size="lg"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <span className="spinner-border spinner-border-sm me-2" />
+              Реєстрація...
+            </>
+          ) : (
+            'Зареєструватися'
+          )}
+        </Button>
+      </div>
+    </Form>
   );
 };
 
