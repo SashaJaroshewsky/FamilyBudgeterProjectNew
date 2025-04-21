@@ -23,6 +23,7 @@ import CreateTransactionPage from './pages/CreateTransactionPage';
 import CategoriesPage from './pages/CategoriesPage';
 import CreateCategoryPage from './pages/CreateCategoryPage';
 import CreateFamilyPage from './pages/CreateFamilyPage';
+import UpdateGoalAmountPage from './pages/UpdateGoalAmountPage';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -103,6 +104,11 @@ const AppRoutes: React.FC = () => {
       <Route path="/budgets/:budgetId/goals/create" element={
         <PrivateRoute>
           <CreateFinancialGoalPage />
+        </PrivateRoute>
+      } />
+      <Route path="/goals/:goalId/update-amount" element={
+        <PrivateRoute>
+          <UpdateGoalAmountPage />
         </PrivateRoute>
       } />
 

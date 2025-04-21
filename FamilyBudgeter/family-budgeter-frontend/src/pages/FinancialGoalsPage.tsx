@@ -187,6 +187,15 @@ const FinancialGoalsPage: React.FC = () => {
 
                         <div className="d-flex gap-2">
                           <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={() => navigate(`/goals/${goal.id}/update-amount`)}
+                            disabled={goal.status === FinancialGoalStatus.Completed}
+                          >
+                            <i className="bi bi-plus-circle me-1"></i>
+                            Поповнити
+                          </Button>
+                          <Button
                             variant="outline-primary"
                             size="sm"
                             onClick={() => navigate(`/goals/${goal.id}`)}

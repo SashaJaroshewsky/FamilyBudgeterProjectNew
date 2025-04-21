@@ -61,10 +61,44 @@ const CreateFinancialGoalPage: React.FC = () => {
       setSubmitting(true);
       setError(null);
       
-      const newGoal = await financialGoalApi.createGoal(formData);
-      navigate(`/budgets/${formData.budgetId}`);
+      if (!formData.budgetId) {
+        throw new Error('Виберіть бюджет');
+      }
+
+      // Add validation for required fields
+      if (!formData.name.trim()) {
+        throw new Error('Назва цілі обов\'язкова');
+      }
+
+      if (formData.targetAmount <= 0) {
+        throw new Error('Цільова сума повинна бути більше 0');
+      }
+
+      if (new Date(formData.deadline) <= new Date()) {
+        throw new Error('Дата досягнення повинна бути в майбутньому');
+      }
+      
+      const newGoal = await financialGoalApi.createGoal({
+        ...formData,
+        name: formData.name.trim(),
+        description: formData.description?.trim(),
+        deadline: new Date(formData.deadline)
+      });
+
+      // Add small delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Navigate based on context
+      if (preselectedBudgetId) {
+        navigate(`/budgets/${preselectedBudgetId}/goals`);
+      } else {
+        navigate('/goals');
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Помилка створення фінансової цілі');
+      console.error('Error creating goal:', err);
+      setError(
+        err instanceof Error ? err.message : 'Помилка створення фінансової цілі'
+      );
     } finally {
       setSubmitting(false);
     }
@@ -74,8 +108,9 @@ const CreateFinancialGoalPage: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'budgetId' ? parseInt(value, 10) : 
-              (name === 'targetAmount' || name === 'currentAmount') ? parseFloat(value) : 
+      [name]: name === 'budgetId' ? (value ? parseInt(value, 10) : 0) : 
+              (name === 'targetAmount' || name === 'currentAmount') ? 
+                (value ? parseFloat(value) : 0) : 
               name === 'deadline' ? new Date(value) : value
     }));
   };
@@ -153,7 +188,7 @@ const CreateFinancialGoalPage: React.FC = () => {
                           required
                           type="number"
                           name="targetAmount"
-                          value={formData.targetAmount}
+                          value={formData.targetAmount || ''}
                           onChange={handleInputChange}
                           disabled={submitting}
                           min={0}
@@ -171,7 +206,7 @@ const CreateFinancialGoalPage: React.FC = () => {
                           required
                           type="number"
                           name="currentAmount"
-                          value={formData.currentAmount}
+                          value={formData.currentAmount || ''}
                           onChange={handleInputChange}
                           disabled={submitting}
                           min={0}
@@ -195,9 +230,10 @@ const CreateFinancialGoalPage: React.FC = () => {
                       onChange={handleInputChange}
                       disabled={submitting}
                       min={new Date().toISOString().split('T')[0]}
+                      isInvalid={validated && new Date(formData.deadline) <= new Date()}
                     />
                     <Form.Control.Feedback type="invalid">
-                      Оберіть дату досягнення цілі
+                      Дата досягнення повинна бути в майбутньому
                     </Form.Control.Feedback>
                   </Form.Group>
 
@@ -206,9 +242,10 @@ const CreateFinancialGoalPage: React.FC = () => {
                     <Form.Select
                       required
                       name="budgetId"
-                      value={formData.budgetId}
+                      value={formData.budgetId || ''}
                       onChange={handleInputChange}
                       disabled={submitting || !!preselectedBudgetId}
+                      isInvalid={validated && !formData.budgetId}
                     >
                       <option value="">Виберіть бюджет</option>
                       {budgets.map(budget => (

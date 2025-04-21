@@ -13,7 +13,7 @@ export const financialGoalApi = {
    * Отримання всіх фінансових цілей бюджету
    */
   getBudgetGoals: async (budgetId: number): Promise<FinancialGoal[]> => {
-    const response = await api.get<FinancialGoal[]>(`/financial-goal/budget/${budgetId}`);
+    const response = await api.get<FinancialGoal[]>(`/FinancialGoal/budget/${budgetId}`);
     return response.data;
   },
 
@@ -21,7 +21,7 @@ export const financialGoalApi = {
    * Отримання фінансової цілі за ідентифікатором
    */
   getGoalById: async (id: number): Promise<FinancialGoal> => {
-    const response = await api.get<FinancialGoal>(`/financial-goal/${id}`);
+    const response = await api.get<FinancialGoal>(`/FinancialGoal/${id}`);
     return response.data;
   },
 
@@ -29,7 +29,7 @@ export const financialGoalApi = {
    * Створення нової фінансової цілі
    */
   createGoal: async (data: CreateFinancialGoal): Promise<FinancialGoal> => {
-    const response = await api.post<FinancialGoal>('/financial-goal', data);
+    const response = await api.post<FinancialGoal>('/FinancialGoal', data);
     return response.data;
   },
 
@@ -37,7 +37,7 @@ export const financialGoalApi = {
    * Оновлення фінансової цілі
    */
   updateGoal: async (id: number, data: UpdateFinancialGoal): Promise<FinancialGoal> => {
-    const response = await api.put<FinancialGoal>(`/financial-goal/${id}`, data);
+    const response = await api.put<FinancialGoal>(`/FinancialGoal/${id}`, data);
     return response.data;
   },
 
@@ -45,31 +45,31 @@ export const financialGoalApi = {
    * Видалення фінансової цілі
    */
   deleteGoal: async (id: number): Promise<boolean> => {
-    const response = await api.delete<{ success: boolean }>(`/financial-goal/${id}`);
+    const response = await api.delete<{ success: boolean }>(`/FinancialGoal/${id}`);
     return response.data.success;
   },
 
   /**
-   * Оновлення поточної суми фінансової цілі
+   * Оновлення суми фінансової цілі
    */
   updateGoalAmount: async (id: number, data: UpdateFinancialGoalAmount): Promise<FinancialGoal> => {
-    const response = await api.patch<FinancialGoal>(`/financial-goal/${id}/amount`, data);
+    const response = await api.patch<FinancialGoal>(`/FinancialGoal/${id}/amount`, data);
     return response.data;
   },
 
   /**
-   * Отримання фінансових цілей за статусом
+   * Отримання цілей за статусом
    */
   getGoalsByStatus: async (budgetId: number, status: FinancialGoalStatus): Promise<FinancialGoal[]> => {
-    const response = await api.get<FinancialGoal[]>(`/financial-goal/budget/${budgetId}/status/${status}`);
+    const response = await api.get<FinancialGoal[]>(`/FinancialGoal/budget/${budgetId}/status/${status}`);
     return response.data;
   },
 
   /**
-   * Перевірка і оновлення статусу фінансової цілі
+   * Перевірка та оновлення статусу цілі
    */
   checkAndUpdateGoalStatus: async (id: number): Promise<boolean> => {
-    const response = await api.post<{ statusChanged: boolean }>(`/financial-goal/${id}/check-status`);
+    const response = await api.post<{ statusChanged: boolean }>(`/FinancialGoal/${id}/check-status`);
     return response.data.statusChanged;
   }
 };
