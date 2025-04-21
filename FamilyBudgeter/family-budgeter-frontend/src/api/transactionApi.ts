@@ -4,16 +4,33 @@ import {
   Transaction, 
   CreateTransaction, 
   UpdateTransaction, 
-  TransactionFilter 
+  TransactionFilter, 
+  TransactionType
 } from '../models/TransactionModels';
+import { categoryApi } from './categoryApi';
+import { Category, CategoryType } from '../models/CategoryModels';  
 
 export const transactionApi = {
   /**
    * Отримання всіх транзакцій бюджету
    */
   getBudgetTransactions: async (budgetId: number): Promise<Transaction[]> => {
+    // Get transactions
     const response = await api.get<Transaction[]>(`/transaction/budget/${budgetId}`);
-    return response.data;
+    
+    // Get all categories for this budget to determine transaction types
+    const categories = await categoryApi.getBudgetCategories(budgetId);
+    const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
+
+    // Map transactions and set their types based on category
+    const transactions = response.data.map(transaction => ({
+      ...transaction,
+      type: categoryMap.get(transaction.categoryId)?.type === CategoryType.Income 
+        ? TransactionType.Income 
+        : TransactionType.Expense
+    }));
+
+    return transactions;
   },
 
   /**
@@ -29,7 +46,16 @@ export const transactionApi = {
    */
   createTransaction: async (data: CreateTransaction): Promise<Transaction> => {
     const response = await api.post<Transaction>('/transaction', data);
-    return response.data;
+    
+    // Get category to determine transaction type
+    const category = await categoryApi.getCategoryById(data.categoryId);
+    
+    return {
+      ...response.data,
+      type: category.type === CategoryType.Income 
+        ? TransactionType.Income 
+        : TransactionType.Expense
+    };
   },
 
   /**

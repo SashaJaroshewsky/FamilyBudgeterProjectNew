@@ -2,7 +2,8 @@ import React from 'react';
 import { Card, Badge, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { Transaction, TransactionType } from '../../models/TransactionModels';
-
+import { useCategories } from '../../hooks/useCategories';
+import { CategoryType } from '../../models/CategoryModels';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -11,6 +12,11 @@ interface TransactionItemProps {
 
 const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onDelete }) => {
   const navigate = useNavigate();
+  const { categories } = useCategories(transaction.budgetId);
+  const category = categories.get(transaction.categoryId);
+  const transactionType = category?.type === CategoryType.Income 
+    ? TransactionType.Income 
+    : TransactionType.Expense;
 
   const formatDate = (date: Date): string => {
     return new Date(date).toLocaleDateString('uk-UA', {
@@ -23,17 +29,17 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onDelete
   };
 
   return (
-    <Card className="transaction-item shadow-sm mb-3">
+    <Card className="transaction-item mb-3 shadow-sm">
       <Card.Body>
         <div className="d-flex justify-content-between align-items-start">
           <div className="d-flex align-items-center">
-          <div className={`transaction-icon ${
-  transaction.type === TransactionType.Income ? 'income' : 'expense'
-}`}>
-  <i className={`bi ${
-    transaction.type === TransactionType.Income ? 'bi-arrow-down' : 'bi-arrow-up'
-  }`}></i>
-</div>
+            <div className={`transaction-icon ${
+              transactionType === TransactionType.Income ? 'income' : 'expense'
+            }`}>
+              <i className={`bi ${category?.icon || 
+                (transactionType === TransactionType.Income ? 'bi-arrow-down' : 'bi-arrow-up')
+              }`}></i>
+            </div>
             <div className="ms-3">
               <h5 className="mb-1">{transaction.description}</h5>
               <div className="text-muted small">
@@ -43,7 +49,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onDelete
                 </span>
                 <span className="me-3">
                   <i className="bi bi-folder me-1"></i>
-                  {transaction.categoryName}
+                  {category?.name || transaction.categoryName}
                 </span>
                 <span>
                   <i className="bi bi-wallet2 me-1"></i>
@@ -56,14 +62,14 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onDelete
           <div className="text-end">
             <div className="mb-2">
               <span className={`h5 mb-0 ${
-                transaction.type === TransactionType.Income ? 'text-success' : 'text-danger'
+                transactionType === TransactionType.Income ? 'text-success' : 'text-danger'
               }`}>
-                {transaction.type === TransactionType.Income ? '+' : '-'}
+                {transactionType === TransactionType.Income ? '+' : '-'}
                 {transaction.amount.toFixed(2)} {transaction.currency}
               </span>
             </div>
-            <Badge bg={transaction.type === TransactionType.Income ? 'success' : 'danger'}>
-              {transaction.type === TransactionType.Income ? 'Дохід' : 'Витрата'}
+            <Badge bg={transactionType === TransactionType.Income ? 'success' : 'danger'}>
+              {transactionType === TransactionType.Income ? 'Дохід' : 'Витрата'}
             </Badge>
           </div>
         </div>
